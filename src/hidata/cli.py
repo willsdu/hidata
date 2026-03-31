@@ -59,7 +59,7 @@ def chat(
     session = ChatSession(system_prompt=system or ChatSession().system_prompt)
     session.reset()
 
-    console.print("[bold]aishu-agent[/bold] 已启动。输入问题开始对话，输入 /help 查看指令。")
+    console.print("[bold]hidata[/bold] 已启动。输入问题开始对话，输入 /help 查看指令。")
 
     while True:
         try:
@@ -103,3 +103,4 @@ def chat(
 def _default(ctx: typer.Context) -> None:
     if ctx.invoked_subcommand is None:
         chat()
+

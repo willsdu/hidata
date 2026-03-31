@@ -29,3 +29,4 @@ class ChatSession:
     def add_assistant(self, text: str) -> None:
         self.ensure_started()
         self.messages.append({"role": "assistant", "content": text})
+

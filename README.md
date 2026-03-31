@@ -1,4 +1,4 @@
-# aishu-agent（命令行交互式 Agent）
+# hidata（命令行交互式 Agent）
 
 运行后可持续输入问题，Agent 会持续回答（支持上下文对话）。
 
@@ -31,13 +31,13 @@ python -m pip install -e .
 ### 方式 1：安装后直接运行
 
 ```bash
-aishu
+hidata
 ```
 
 ### 方式 2：不安装，直接模块运行
 
 ```bash
-python -m aishu_agent
+python -m hidata
 ```
 
 ## 交互指令

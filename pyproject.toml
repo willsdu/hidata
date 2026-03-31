@@ -1,5 +1,5 @@
 [project]
-name = "aishu-agent"
+name = "hidata"
 version = "0.1.0"
 description = "A simple interactive CLI agent that can answer continuously."
 readme = "README.md"
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-aishu = "aishu_agent.cli:app"
+hidata = "hidata.cli:app"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

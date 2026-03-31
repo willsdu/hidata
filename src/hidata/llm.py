@@ -42,3 +42,4 @@ def chat_once(
     choice = resp.choices[0]
     content = (choice.message.content or "").strip()
     return content
+
