@@ -64,3 +64,19 @@ WORKING_DIR = (
     .expanduser()
     .resolve()
 )
+
+SECRET_DIR = (
+    Path(
+        EnvVarLoader.get_str(
+            "COPAW_SECRET_DIR",
+            f"{WORKING_DIR}.secret",
+        ),
+    )
+    .expanduser()
+    .resolve()
+)
+
+
+# Skills 目录约定
+# 已启用的 skills（agent 会从这里加载）
+ACTIVE_SKILLS_DIR = WORKING_DIR / "active_skills"
