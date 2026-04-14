@@ -1,6 +1,3 @@
-
-
-
 import logging
 from dataclasses import Field
 from pydantic import BaseModel, Field
@@ -187,7 +184,7 @@ class ActiveModelsInfo(BaseModel):
 
 class ProviderManager:
 
-    _instance: 'ProviderManager' | None = None
+    _instance  = None
 
     def __init__(self) -> None:
         self.built_in_providers : Dict[str, Provider] = {}

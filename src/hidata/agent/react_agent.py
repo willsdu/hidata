@@ -93,7 +93,7 @@ class HidataAgent(ReActAgent):
 
         config=load_config()
         enabled_tools = {}
-        if hasattr(config, "tools") and hasattr(config.tools, "buiildin_tools"):
+        if hasattr(config, "tools") and hasattr(config.tools, "builtin_tools"):
             enabled_tools = {
                 name: tool_config.enabled
                 for name, tool_config in config.tools.buiildin_tools.items()
