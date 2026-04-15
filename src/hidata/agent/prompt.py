@@ -125,7 +125,7 @@ def build_system_prompt_from_working_dir() -> str:
     """
     从工作目录读取 Markdown 文件，构建系统提示词。
 
-    本函数通过从 WORKING_DIR（默认 ~/.copaw）加载 Markdown 文件来组装系统提示词。
+    本函数通过从 WORKING_DIR（默认 ~/.hidata）加载 Markdown 文件来组装系统提示词。
     这些文件用于定义智能体的行为、人格与操作规范。
 
     要加载的文件由配置项 agents.system_prompt_files 决定。

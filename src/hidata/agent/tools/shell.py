@@ -14,7 +14,7 @@ from typing import Optional
 from agentscope.message import TextBlock
 from agentscope.tool import ToolResponse
 
-from copaw.constant import WORKING_DIR
+from hidata.constant import WORKING_DIR
 from .utils import truncate_shell_output
 
 

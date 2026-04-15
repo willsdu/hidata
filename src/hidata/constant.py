@@ -68,7 +68,7 @@ WORKING_DIR = (
 SECRET_DIR = (
     Path(
         EnvVarLoader.get_str(
-            "COPAW_SECRET_DIR",
+            "HIDATA_SECRET_DIR",
             f"{WORKING_DIR}.secret",
         ),
     )
@@ -80,3 +80,32 @@ SECRET_DIR = (
 # Skills 目录约定
 # 已启用的 skills（agent 会从这里加载）
 ACTIVE_SKILLS_DIR = WORKING_DIR / "active_skills"
+
+
+
+# 应用日志级别的环境变量 key（CLI 与应用启动/重载子进程都会使用）
+LOG_LEVEL_ENV = "HIDATA_LOG_LEVEL"
+
+
+# 是否启用 OpenAPI 文档端点（/docs、/redoc、/openapi.json）
+# 建议仅开发环境开启，生产环境保持关闭。
+DOCS_ENABLED = EnvVarLoader.get_bool("HIDATA_OPENAPI_DOCS", False)
+
+# ----------------------------
+# 其他运行时常量（供 config/utils.py 等使用）
+# ----------------------------
+
+# Heartbeat query markdown filename under WORKING_DIR
+HEARTBEAT_FILE = "HEARTBEAT.md"
+
+# Cron jobs storage filename under WORKING_DIR
+JOBS_FILE = "jobs.json"
+
+# Chats storage filename under WORKING_DIR
+CHATS_FILE = "chats.json"
+
+# Playwright: optional system chromium executable path override
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH_ENV = "HIDATA_PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
+
+# Container detection override (1/true/yes forces True)
+RUNNING_IN_CONTAINER = EnvVarLoader.get_bool("HIDATA_RUNNING_IN_CONTAINER", False)
