@@ -4,15 +4,16 @@ from typing import Literal, Optional
 from agentscope.memory import InMemoryMemory
 from agentscope.tool import Toolkit
 from agentscope.agent import ReActAgent
+from .hooks import BootstrapHook, MemoryCompactionHook
 
 from hidata.model_factory import create_model_and_formatter
 
 from hidata.agent.prompt import build_system_prompt_from_working_dir
 
-from ..config.util import load_config
+from ..config.utils import load_config
 
 from .skills_manager import (
-    get_working_skills_dir,
+    get_active_skills_dir,
     list_available_skills,
 ) 
 
@@ -28,6 +29,7 @@ from .tools import (
     write_file,
     create_memory_search_tool,  
 )
+from ..constant import WORKING_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -134,11 +136,11 @@ class HidataAgent(ReActAgent):
         Returns:
             None
         """
-        working_skills_dir= get_working_skills_dir()
+        activate_skills_dir= get_active_skills_dir()
         available_skills = list_available_skills()
 
         for skill_name in available_skills:
-            skill_dir = working_skills_dir / skill_name
+            skill_dir = activate_skills_dir / skill_name
             if skill_dir.exists():
                 try:
                     toolkit.register_agent_skill(str(skill_dir))
@@ -146,3 +148,13 @@ class HidataAgent(ReActAgent):
                 except Exception as e:
                     logger.warning(f"Failed to register skill {skill_name}: {e}")
                     continue
+
+    def _register_hooks(self) -> None:
+        """Register pre-reasoning and pre-acting hooks."""
+        # Bootstrap hook - checks BOOTSTRAP.md on first interaction
+        config=load_config()
+        bootstrap_hook=BootstrapHook(
+            working_dir=WORKING_DIR,
+            language=config.agent.language,
+        )
+

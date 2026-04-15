@@ -16,12 +16,7 @@ logger = logging.getLogger(__name__)
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(version=__version__, prog_name="hidata")
 @click.option("--host", default=None, help="API 地址（Host）")
-@click.option(
-    "--port",
-    default=None,
-    type=int,
-    help="API 端口（Port）",
-)
+@click.option("--port",default=None,type=int,help="API 端口（Port）",)
 @click.pass_context
 def cli(ctx: click.Context, host: str|None=None, port: int|None=None) -> None:
     last=read_last_api()

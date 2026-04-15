@@ -10,15 +10,6 @@ def get_active_skills_dir() -> Path:
     """Get the path to active skills directory in working_dir."""
     return ACTIVE_SKILLS_DIR
 
-def get_working_skills_dir() -> Path:
-    """
-    Get the path to working skills directory in working_dir.
-
-    Returns:
-        Path to working skills directory.
-    """
-    return ACTIVE_SKILLS_DIR
-
 def list_available_skills() -> list[str]:
     """
     List all available skills in active_skills directory.
