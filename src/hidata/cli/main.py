@@ -7,6 +7,7 @@ import click
 from hidata.config.utils import read_last_api
 from hidata.cli.app_cmd import app_cmd
 from hidata.__version__ import __version__
+from hidata.cli.relay_cmd import relay_cmd
 
 
 logger = logging.getLogger(__name__)
@@ -36,3 +37,4 @@ def cli(ctx: click.Context, host: str|None=None, port: int|None=None) -> None:
     ctx.obj["port"] = port
 
 cli.add_command(app_cmd)
+cli.add_command(relay_cmd)

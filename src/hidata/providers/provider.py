@@ -11,15 +11,22 @@ class ModelInfo(BaseModel):
 class ProviderInfo(BaseModel):
     id: str = Field(..., description="Provider identifier used in API calls")
     name: str = Field(..., description="Human-readable provider name")
-    base_url: str = Field(..., description="Base URL of the provider")
-    api_key:str = Field(..., description="API key of the authentication")
+    base_url: str = Field(
+        default="",
+        description="Base URL of the provider (empty for local providers)",
+    )
+    api_key: str = Field(
+        default="",
+        description="API key of the authentication (empty until configured)",
+    )
     chat_model:str=Field(
         default="OpenAIChatModel",
         description="Chat model class to use for this provider",
     )
-    pre_defined_models: List[ModelInfo] = Field(
+    models: List[ModelInfo] = Field(
         default_factory=list,
         description="List of pre-defined models",
+        validation_alias="pre_defined_models",
     )
     extra_models: List[ModelInfo] = Field(
         default_factory=list,
@@ -149,8 +156,20 @@ class Provider(ProviderInfo, ABC):
 class DefaultProvider(Provider):
     """Default provider implementation."""
 
+    async def check_connection(self, timeout: float = 5) -> tuple[bool, str]:  # pylint: disable=unused-argument
+        return True, ""
+
     async def fetch_models(self, timeout: float = 5) -> List[ModelInfo]:
         return self.models
+
+    async def check_model_connection(
+        self,
+        model_id: str,
+        timeout: float = 5,  # pylint: disable=unused-argument
+    ) -> tuple[bool, str]:
+        if not (model_id or "").strip():
+            return False, "Empty model ID"
+        return True, ""
 
     def get_chat_model_instance(self, model_id: str) -> ChatModelBase:
         raise NotImplementedError(

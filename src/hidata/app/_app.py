@@ -3,6 +3,7 @@ from agentscope_runtime.engine.app.agent_app import AgentApp
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import time
+from dotenv import load_dotenv
 
 from hidata.constant import WORKING_DIR
 from hidata.utils.logging import add_hidata_file_handler
@@ -24,15 +25,39 @@ agent_app = AgentApp(
 async def lifespan(
     app: FastAPI,
 ):  # pylint: disable=too-many-statements,too-many-branches
-    startup_start_time = time.time()
+    _startup_start_time = time.time()
+    # Load .env so server process can read OPENAI_* config.
+    load_dotenv(override=False)
     add_hidata_file_handler(WORKING_DIR / "hidata.log")
     await runner.start()
 
- # --- Model provider manager (non-reloadable, in-memory) ---
+    # --- Model provider manager (non-reloadable, in-memory) ---
     provider_manager = ProviderManager.get_instance()
 
     app.state.runner = runner
     app.state.provider_manager = provider_manager
+
+    try:
+        yield
+    finally:
+        # Best-effort shutdown. Runner API differs by framework/runtime version,
+        # so guard calls to avoid masking the original exception.
+        stop = getattr(runner, "stop", None)
+        if callable(stop):
+            try:
+                res = stop()
+                if hasattr(res, "__await__"):
+                    await res
+            except Exception:
+                pass
+        shutdown = getattr(runner, "shutdown", None)
+        if callable(shutdown):
+            try:
+                res = shutdown()
+                if hasattr(res, "__await__"):
+                    await res
+            except Exception:
+                pass
 
 
 
