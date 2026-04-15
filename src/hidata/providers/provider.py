@@ -98,6 +98,54 @@ class Provider(ProviderInfo, ABC):
             return False, f"Invalid target: {target} for adding model"
         return True, ""
 
+    async def delete_model(self, model_id: str, timeout: float = 10) -> tuple[bool, str]:
+        """Delete a model from the provider."""
+        self.extra_models = [model for model in self.extra_models if model.id != model_id]
+        return True, ""
+
+    def update_config(self,config:Dict)->None:
+        """Update provider configuration with the given dictionary."""
+        if "name" in config and config["name"] is not None:
+            self.name = str(config["name"])
+        if (
+            not self.freeze_url
+            and "base_url" in config
+            and config["base_url"] is not None
+        ):
+            self.base_url = str(config["base_url"])
+        if "api_key" in config and config["api_key"] is not None:
+            self.api_key = str(config["api_key"])
+        if (
+            self.is_custom
+            and "chat_model" in config
+            and config["chat_model"] is not None
+        ):
+            self.chat_model = str(config["chat_model"])
+        if "api_key_prefix" in config and config["api_key_prefix"] is not None:
+            self.api_key_prefix = str(config["api_key_prefix"])
+        if (
+            "generate_kwargs" in config
+            and config["generate_kwargs"] is not None
+            and isinstance(config["generate_kwargs"], dict)
+        ):
+            self.generate_kwargs = config["generate_kwargs"]
+        
+    def get_chat_model_cls(self) -> Type[ChatModelBase]:
+        """Get the chat model class for this provider."""
+        import agentscope.model
+        chat_model_cls = getattr(
+            agentscope.model,
+            self.chat_model,
+            None,
+        )
+        if chat_model_cls is None:
+            raise ValueError(
+                f"Chat model class '{self.chat_model}' not found"
+                f" for provider '{self.name}'.",
+            )
+        return chat_model_cls
+
+
 class DefaultProvider(Provider):
     """Default provider implementation."""
 
