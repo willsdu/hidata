@@ -9,5 +9,10 @@ __pycache__/
 .idea/
 dist/
 build/
+node_modules/
 *.egg-info/
 test.py
+test/*
+.pnpm-store/
+.vscode/
+.pnpm
