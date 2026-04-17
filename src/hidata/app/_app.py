@@ -100,24 +100,23 @@ def _resolve_console_static_dir() -> Path:
     """解析 Web 控制台静态资源目录。
 
     优先级顺序：
-    1. `COPAW_CONSOLE_STATIC_DIR` 环境变量（显式覆盖）
-    2. 已打包发行版中的 `copaw/console` 目录
-    3. 本地工作目录的兜底路径（开发/构建产物）
+    1. `HIDATA_CONSOLE_STATIC_DIR` 环境变量（显式覆盖）
+    2. 包内 `console/assets`（Vite 默认构建输出）或 `console/` 旧布局
+    3. 当前工作目录下的 `console/assets` / `console/dist` 等兜底
     """
     if os.environ.get(_CONSOLE_STATIC_ENV):
         return os.environ.get(_CONSOLE_STATIC_ENV)
     pkg_dir = Path(__file__).resolve().parent.parent
-    candidate_dir=pkg_dir / "console" 
-    if candidate_dir.is_dir() and (candidate_dir / "index.html").exists():
-        return str(candidate_dir)
-    # 兼容/兜底逻辑：下一次发布后预计可移除
-    # （因为届时 `vite` 会直接把 console 输出到 `src/copaw/console/` 目录）。 
+    for rel in ("console/assets", "console"):
+        candidate_dir = pkg_dir / rel
+        if candidate_dir.is_dir() and (candidate_dir / "index.html").exists():
+            return str(candidate_dir)
     cwd = Path(os.getcwd())
-    for subdir in ("console/dist", "console_dist"):
+    for subdir in ("console/assets", "console/dist", "console_dist"):
         candidate = cwd / subdir
         if candidate.is_dir() and (candidate / "index.html").exists():
             return str(candidate)
-    return str(cwd / "console" / "dist")
+    return str(cwd / "console" / "assets")
 
 _CONSOLE_STATIC_DIR = _resolve_console_static_dir()
 _CONSOLE_INDEX = (
@@ -134,6 +133,7 @@ def read_root():
             "HiData Web Console is not available. "
             "If you installed HiData from source code, please run "
             "`npm ci && npm run build` in HiData's `console/` "
+            "(output: `console/assets/`) "
             "directory, and restart HiData to enable the web console."
         ),
     }

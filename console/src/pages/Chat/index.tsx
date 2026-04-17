@@ -1,5 +1,9 @@
-import { Button, Card, Input, Layout, Space, Typography } from "antd";
+import { Button, Card, Input, Layout, Space, Typography, message } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  streamAgentProcess,
+  type AgentInputMessage,
+} from "../../api/agent";
 
 type ChatRole = "user" | "assistant";
 
@@ -7,10 +11,22 @@ type ChatMessage = {
   id: string;
   role: ChatRole;
   content: string;
+  /** 仅界面展示，不参与发给后端的 history */
+  localOnly?: boolean;
 };
 
 function nowId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function toAgentInput(messages: ChatMessage[]): AgentInputMessage[] {
+  return messages
+    .filter((m) => !m.localOnly)
+    .map((m) => ({
+      type: "message" as const,
+      role: m.role,
+      content: [{ type: "text" as const, text: m.content }],
+    }));
 }
 
 export default function ChatPage() {
@@ -18,34 +34,70 @@ export default function ChatPage() {
     {
       id: nowId(),
       role: "assistant",
-      content: "你好！这里是 console 的初始聊天页。",
+      content: "你好！在下方输入问题，将通过 /api/agent/process 交给 Agent 回答。",
+      localOnly: true,
     },
   ]);
   const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
 
-  const canSend = useMemo(() => draft.trim().length > 0, [draft]);
+  const canSend = useMemo(
+    () => !loading && draft.trim().length > 0,
+    [draft, loading],
+  );
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-  }, [messages.length]);
+  }, [messages]);
 
-  const send = () => {
+  const send = async () => {
     const text = draft.trim();
-    if (!text) return;
+    if (!text || loading) return;
     setDraft("");
 
     const userMsg: ChatMessage = { id: nowId(), role: "user", content: text };
     setMessages((prev) => [...prev, userMsg]);
 
-    window.setTimeout(() => {
-      const assistantMsg: ChatMessage = {
-        id: nowId(),
-        role: "assistant",
-        content: `收到：${text}`,
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-    }, 300);
+    const historyForApi = toAgentInput([...messages, userMsg]);
+
+    const assistantId = nowId();
+    setMessages((prev) => [
+      ...prev,
+      { id: assistantId, role: "assistant", content: "" },
+    ]);
+
+    setLoading(true);
+    try {
+      const final = await streamAgentProcess(historyForApi, {
+        onDelta: (_delta, accumulated) => {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId ? { ...m, content: accumulated } : m,
+            ),
+          );
+        },
+      });
+      if (!final.trim()) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId ? { ...m, content: "（无内容）" } : m,
+          ),
+        );
+      }
+    } catch (e) {
+      const err = e instanceof Error ? e.message : String(e);
+      message.error(err);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantId
+            ? { ...m, content: m.content ? `${m.content}\n\n[错误] ${err}` : `请求失败：${err}` }
+            : m,
+        ),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,12 +151,18 @@ export default function ChatPage() {
           <Input
             value={draft}
             placeholder="输入消息…"
+            disabled={loading}
             onChange={(e) => setDraft(e.target.value)}
             onPressEnter={() => {
-              if (canSend) send();
+              if (canSend) void send();
             }}
           />
-          <Button type="primary" disabled={!canSend} onClick={send}>
+          <Button
+            type="primary"
+            loading={loading}
+            disabled={!canSend}
+            onClick={() => void send()}
+          >
             发送
           </Button>
         </Space.Compact>
@@ -112,4 +170,3 @@ export default function ChatPage() {
     </Layout>
   );
 }
-
