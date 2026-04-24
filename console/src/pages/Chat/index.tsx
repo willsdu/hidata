@@ -101,14 +101,17 @@ export default function ChatPage() {
   };
 
   return (
-    <Layout style={{ height: "100vh", padding: 16 }}>
+    <Layout style={{ minHeight: "calc(100vh - 64px)", padding: 16 }}>
       <Space direction="vertical" size={12} style={{ height: "100%" }}>
         <Typography.Title level={3} style={{ margin: 0 }}>
           聊天
         </Typography.Title>
 
         <Card
-          bodyStyle={{ height: "calc(100vh - 170px)", overflow: "auto" }}
+          bodyStyle={{
+            height: "calc(100vh - 64px - 170px)",
+            overflow: "auto",
+          }}
           style={{ width: "min(980px, 100%)" }}
         >
           <div ref={listRef}>

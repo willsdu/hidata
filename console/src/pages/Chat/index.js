@@ -65,7 +65,10 @@ export default function ChatPage() {
             setLoading(false);
         }
     };
-    return (_jsx(Layout, { style: { height: "100vh", padding: 16 }, children: _jsxs(Space, { direction: "vertical", size: 12, style: { height: "100%" }, children: [_jsx(Typography.Title, { level: 3, style: { margin: 0 }, children: "\u804A\u5929" }), _jsx(Card, { bodyStyle: { height: "calc(100vh - 170px)", overflow: "auto" }, style: { width: "min(980px, 100%)" }, children: _jsx("div", { ref: listRef, children: _jsx(Space, { direction: "vertical", size: 10, style: { width: "100%" }, children: messages.map((m) => (_jsx("div", { style: {
+    return (_jsx(Layout, { style: { minHeight: "calc(100vh - 64px)", padding: 16 }, children: _jsxs(Space, { direction: "vertical", size: 12, style: { height: "100%" }, children: [_jsx(Typography.Title, { level: 3, style: { margin: 0 }, children: "\u804A\u5929" }), _jsx(Card, { bodyStyle: {
+                        height: "calc(100vh - 64px - 170px)",
+                        overflow: "auto",
+                    }, style: { width: "min(980px, 100%)" }, children: _jsx("div", { ref: listRef, children: _jsx(Space, { direction: "vertical", size: 10, style: { width: "100%" }, children: messages.map((m) => (_jsx("div", { style: {
                                     display: "flex",
                                     justifyContent: m.role === "user" ? "flex-end" : "flex-start",
                                 }, children: _jsx("div", { style: {

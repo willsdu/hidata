@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/api/agent.ts","./src/pages/chat/index.tsx","./vite.config.ts"],"version":"5.8.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/api/agent.ts","./src/api/providers.ts","./src/pages/chat/index.tsx","./src/pages/providers/index.tsx","./vite.config.ts"],"version":"5.8.3"}

@@ -110,6 +110,10 @@ class Provider(ProviderInfo, ABC):
         self.extra_models = [model for model in self.extra_models if model.id != model_id]
         return True, ""
 
+    async def get_info(self) -> "ProviderInfo":
+        """Return a public snapshot of this provider for list/detail APIs."""
+        return ProviderInfo.model_validate(self.model_dump())
+
     def update_config(self,config:Dict)->None:
         """Update provider configuration with the given dictionary."""
         if "name" in config and config["name"] is not None:
